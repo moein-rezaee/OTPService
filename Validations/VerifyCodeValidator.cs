@@ -6,9 +6,15 @@ namespace OTPService.Validations {
     {
         public VerifyCodeValidator()
         {
-            RuleFor(i => i.Code).NotEmpty();
-            RuleFor(i => i.Code).NotNull();
-            RuleFor(i => i.Code).Length(4, 4);
+            RuleFor(i => i.Code)
+                .NotEmpty()
+                .NotNull()
+                .Length(4, 4);
+            
+            RuleFor(i => i.ValidCode)
+                .NotEmpty()
+                .NotNull()
+                .Equal(i => i.Code);
         }
         
     }

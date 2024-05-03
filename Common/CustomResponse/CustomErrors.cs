@@ -16,7 +16,7 @@ namespace OTPService.Common
         };
 
 
-        public static Result HttpRequestFailed(HttpResponseMessage data) => new ()
+        public static Result HttpRequestFailed(HttpResponseMessage data) => new()
         {
             Message = new Message()
             {
@@ -28,7 +28,7 @@ namespace OTPService.Common
             Status = false
         };
 
-        public static Result SendCodeFailed() => new ()
+        public static Result SendCodeFailed() => new()
         {
             Message = new Message()
             {
@@ -39,7 +39,7 @@ namespace OTPService.Common
             Status = false
         };
 
-        public static Result SendCodeServerError() => new ()
+        public static Result SendCodeServerError() => new()
         {
             Message = new Message()
             {
@@ -50,7 +50,7 @@ namespace OTPService.Common
             Status = false
         };
 
-        public static Result VerifyCodeServerError() => new ()
+        public static Result VerifyCodeServerError() => new()
         {
             Message = new Message()
             {
@@ -59,6 +59,17 @@ namespace OTPService.Common
             },
             StatusCode = StatusCodes.Status500InternalServerError,
             Status = false
+        };
+
+        public static Result InvalidCode() => new()
+        {
+            Message = new()
+            {
+                Fa = "کد وارشده معتبر نمی باشد",
+                En = "Invalid Code!"
+            },
+            StatusCode = StatusCodes.Status400BadRequest,
+            Status = false,
         };
     }
 }

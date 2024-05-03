@@ -27,14 +27,25 @@ namespace OTPService.Common
             StatusCode = (int)data.StatusCode,
         };
 
-        public static Result CodeSent() => new()
+        public static Result CodeSent(object data) => new()
         {
             Message = new Message()
             {
                 Fa = "ارسال کد یکبارمصرف با موفقیت انجام شد",
                 En = "Good Job. Code Sent!"
             },
+            Data = data,
             StatusCode = StatusCodes.Status200OK,
+        };
+        
+        public static Result ValidCode() => new()
+        {
+            Message = new Message()
+            {
+                Fa = "کد وارد شده معتبر می باشد",
+                En = "Good Job. Code is Valid!"
+            },
+            StatusCode = StatusCodes.Status202Accepted,
         };
     }
 }

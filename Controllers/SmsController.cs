@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using OTPService.Common;
 using OTPService.DTOs;
+using OTPService.Services;
 
 namespace OTPService.Controllers;
 
@@ -12,9 +13,13 @@ namespace OTPService.Controllers;
 public class SmsController : ControllerBase
 {
     private readonly ILogger<SmsController> _logger;
-    private readonly FetchHttpRequest _fetch;
     private readonly IValidator<SendCodeDto> _sendCodeValidator;
     private readonly IValidator<VerifyCodeDto> _verifyCodeValidator;
+    private readonly SmsService _service;
+    private readonly string SESSION_KEY = "Code";
+
+
+
     public SmsController(
         IValidator<SendCodeDto> sendCodeValidator,
         IValidator<VerifyCodeDto> verifyCodeValidator,
@@ -24,28 +29,22 @@ public class SmsController : ControllerBase
         _logger = logger;
         _sendCodeValidator = sendCodeValidator;
         _verifyCodeValidator = verifyCodeValidator;
+        _service = new SmsService(httpClientFactory);
 
-        FetchClientOptions fetchClientOptions = new()
-        {
-            BaseUrl = "https://api.kavenegar.com/v1/"
-        };
-        _fetch = new(httpClientFactory, fetchClientOptions);
     }
 
     [HttpGet("{mobile}")]
     public async Task<IActionResult> SendCode(string mobile)
     {
         var result = new Result();
-        var code = new Random().Next(1000, 9999).ToString();
         var dto = new SendCodeDto()
         {
             Mobile = mobile,
-            Message = "کد احراز هویت شما جهت ورود به سامانه: " + code,
-            SenderNumber = ""
         };
 
         try
         {
+            //Validation
             var check = _sendCodeValidator.Validate(dto);
             if (!check.IsValid)
             {
@@ -53,22 +52,14 @@ public class SmsController : ControllerBase
                 return StatusCode(result.StatusCode, result);
             }
 
-            // Send Code
-            string API_KEY = "51566F5254736B6161375775564279316957454E4F5436527A6E70536756454E";
-            FetchRequestOptions options = new()
+            result = await _service.SendCode(dto);
+            string? code = result.Data?.ToString() ?? null;
+            if (result.Status && !string.IsNullOrEmpty(code))
             {
-                Url = $@"{API_KEY}/sms/send.json",
-                Params = $@"?receptor={dto.Mobile}&sender={dto.SenderNumber}&message={dto.Message}"
-            };
-            var responce = await _fetch.Get(options);
-
-            if (!responce.Status)
-            {
-                result = CustomErrors.SendCodeFailed();
-                return StatusCode(result.StatusCode, result);
+                HttpContext.Session.SetString(SESSION_KEY, code);
+                result.Data = null;
             }
 
-            result = CustomResults.CodeSent();
             return StatusCode(result.StatusCode, result);
         }
         catch (Exception e)
@@ -80,24 +71,24 @@ public class SmsController : ControllerBase
     }
 
     [HttpGet("{code}")]
-    public async Task<IActionResult> VerifyCode(string code)
+    public IActionResult VerifyCode(string code)
     {
         var result = new Result();
-        var dto = new VerifyCodeDto()
-        {
-            Code = code
-        };
 
         try
         {
-            var check = _verifyCodeValidator.Validate(dto);
-            if (!check.IsValid)
+            string? ValidCode = HttpContext.Session.GetString(SESSION_KEY);
+            var dto = new VerifyCodeDto()
             {
-                result = CustomErrors.InvalidMobileNumber();
-                return StatusCode(result.StatusCode, result);
-            }
+                Code = code,
+                ValidCode = ValidCode
+            };
 
-            // Verify Code
+            var check = _verifyCodeValidator.Validate(dto);
+            if (check.IsValid)
+                result = CustomResults.ValidCode();
+            else
+                result = CustomErrors.InvalidCode();
 
             return StatusCode(result.StatusCode, result);
         }
