@@ -1,6 +1,7 @@
 using CustomResponce.Models;
 using Fetch;
 using FluentValidation;
+using Kavenegar.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using OTPService.Common;
 using OTPService.DTOs;
