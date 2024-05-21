@@ -8,8 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IValidator<SendCodeDto>, SendCodeValidator>();
-builder.Services.AddScoped<IValidator<VerifyCodeDto>, VerifyCodeValidator>();
+builder.Services.AddScoped<IValidator<SendSmsDto>, SendSmsValidator>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -17,8 +16,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseSession();
 
 app.UseHttpsRedirection();
 app.MapControllers();
