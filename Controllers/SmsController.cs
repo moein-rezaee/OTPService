@@ -1,7 +1,5 @@
 using CustomResponce.Models;
-using Fetch;
 using FluentValidation;
-using Kavenegar.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using OTPService.Common;
 using OTPService.DTOs;
@@ -11,92 +9,36 @@ namespace OTPService.Controllers;
 
 [ApiController]
 [Route("[action]")]
-public class SmsController : ControllerBase
+public class SmsController(
+    IValidator<SendSmsDto> sendCodeValidator,
+    ILogger<SmsController> logger) : ControllerBase
 {
-    private readonly ILogger<SmsController> _logger;
-    private readonly IValidator<SendCodeDto> _sendCodeValidator;
-    private readonly IValidator<VerifyCodeDto> _verifyCodeValidator;
-    private readonly SmsService _service;
-    private readonly string SESSION_KEY = "Code";
+    private readonly ILogger<SmsController> _logger = logger;
+    private readonly IValidator<SendSmsDto> _sendCodeValidator = sendCodeValidator;
+    private readonly SmsService _service = new();
 
 
-
-    public SmsController(
-        IValidator<SendCodeDto> sendCodeValidator,
-        IValidator<VerifyCodeDto> verifyCodeValidator,
-        IHttpClientFactory httpClientFactory,
-        ILogger<SmsController> logger)
-    {
-        _logger = logger;
-        _sendCodeValidator = sendCodeValidator;
-        _verifyCodeValidator = verifyCodeValidator;
-        _service = new SmsService(httpClientFactory);
-
-    }
-
-    [HttpGet("{mobile}")]
-    public async Task<IActionResult> SendCode(string mobile)
+    [HttpPost]
+    public async Task<IActionResult> Send(SendSmsDto dto)
     {
         var result = new Result();
-        var dto = new SendCodeDto()
-        {
-            Mobile = mobile,
-        };
-
         try
         {
             //Validation
             var check = _sendCodeValidator.Validate(dto);
             if (!check.IsValid)
             {
-                result = CustomErrors.InvalidMobileNumber();
+                result = CustomErrors.InvalidInputData(check.Errors);
                 return StatusCode(result.StatusCode, result);
             }
 
-            result = await _service.SendCode(dto);
-            string? code = result.Data?.ToString() ?? null;
-            if (result.Status && !string.IsNullOrEmpty(code))
-            {
-                HttpContext.Session.SetString(SESSION_KEY, code);
-                result.Data = null;
-            }
-
+            result = await _service.SendSms(dto);
             return StatusCode(result.StatusCode, result);
         }
         catch (Exception e)
         {
             _logger.LogInformation(e.Message);
-            result = CustomErrors.SendCodeServerError();
-            return StatusCode(result.StatusCode, result);
-        }
-    }
-
-    [HttpGet("{code}")]
-    public IActionResult VerifyCode(string code)
-    {
-        var result = new Result();
-
-        try
-        {
-            string? ValidCode = HttpContext.Session.GetString(SESSION_KEY);
-            var dto = new VerifyCodeDto()
-            {
-                Code = code,
-                ValidCode = ValidCode
-            };
-
-            var check = _verifyCodeValidator.Validate(dto);
-            if (check.IsValid)
-                result = CustomResults.ValidCode();
-            else
-                result = CustomErrors.InvalidCode();
-
-            return StatusCode(result.StatusCode, result);
-        }
-        catch (Exception e)
-        {
-            _logger.LogInformation(e.Message);
-            result = CustomErrors.VerifyCodeServerError();
+            result = CustomErrors.SendSmsServerError(e);
             return StatusCode(result.StatusCode, result);
         }
     }

@@ -4,72 +4,52 @@ namespace OTPService.Common
 {
     public class CustomErrors
     {
-        public static Result InvalidMobileNumber() => new()
+        public static Result InvalidInputData(object? errors) => new()
         {
             Message = new()
             {
-                Fa = "شماره همراه وارد شده معتبر نمی باشد",
-                En = "Invalid Mobile Number"
+                Fa = "داده های ورودی نا معتبر می باشد",
+                En = "Invalid Input Data" 
             },
+            Data = errors,
             StatusCode = StatusCodes.Status400BadRequest,
             Status = false
         };
 
-
-        public static Result HttpRequestFailed(HttpResponseMessage data) => new()
+        public static Result InvalidSendSms(object? data = null) => new()
         {
             Message = new Message()
             {
-                Fa = "خطا هنگام ارسال درخواست",
-                En = "Send Http Request Failed!"
+                Fa = "ارسال پیام مجاز نمی باشد",
+                En = "Send SMS Is Invalid!"
             },
             Data = data,
-            StatusCode = (int)data.StatusCode,
+            StatusCode = StatusCodes.Status401Unauthorized,
             Status = false
         };
 
-        public static Result SendCodeFailed() => new()
+        public static Result SendSmsFailed(object? data = null) => new()
         {
             Message = new Message()
             {
-                Fa = "خطا هنگام ارسال کد",
-                En = "BadGateway. Send Code Failed!"
+                Fa = "خطای برقراری ارتباط با سرویس دهند. لطفا دقایقی دیگر مجددا تلاش نمایید.",
+                En = "Bad Gateway. Send SMS Failed!"
             },
+            Data = data,
             StatusCode = StatusCodes.Status502BadGateway,
             Status = false
         };
 
-        public static Result SendCodeServerError() => new()
+        public static Result SendSmsServerError(object? data) => new()
         {
             Message = new Message()
             {
-                Fa = "خطای سرور هنگام ارسال کد",
-                En = "InternalServerError. Sending Code Failed!"
+                Fa = "خطای سرور هنگام ارسال پیام",
+                En = "InternalServerError. Sending SMS Failed!"
             },
+            Data = data,
             StatusCode = StatusCodes.Status500InternalServerError,
             Status = false
-        };
-
-        public static Result VerifyCodeServerError() => new()
-        {
-            Message = new Message()
-            {
-                Fa = "خطای سرور هنگام تایید کد",
-                En = "InternalServerError. Verify Code Failed!"
-            },
-            StatusCode = StatusCodes.Status500InternalServerError,
-            Status = false
-        };
-
-        public static Result InvalidCode() => new()
-        {
-            Message = new()
-            {
-                Fa = "کد وارشده معتبر نمی باشد",
-                En = "Invalid Code!"
-            },
-            StatusCode = StatusCodes.Status400BadRequest,
-            Status = false,
         };
     }
 }
