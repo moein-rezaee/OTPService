@@ -32,8 +32,8 @@ namespace OTPService.Services
             //TODO: Make Dependency Inversion
             FetchRequestOptions options = new()
             {
-                Url = $@"{API_KEY}/sms/send.json",
-                Params = $@"?receptor={dto.Mobile}&sender={dto.SenderNumber}&message={dto.Message}"
+                Url = $@"{API_KEY}/verify/lookup.json",
+                Params = $@"?receptor={dto.Mobile}&template=&token={code}&template=verify"
             };
             var responce = await _fetch.Get(options);
 
