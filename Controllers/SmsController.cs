@@ -57,7 +57,8 @@ public class SmsController : ControllerBase
             if (result.Status && !string.IsNullOrEmpty(code))
             {
                 HttpContext.Session.SetString(SESSION_KEY, code);
-                result.Data = null;
+                // FIXME: Uncomment
+                // result.Data = null;
             }
 
             return StatusCode(result.StatusCode, result);

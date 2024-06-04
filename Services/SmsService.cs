@@ -30,15 +30,17 @@ namespace OTPService.Services
             dto.Message = "کد احراز هویت شما جهت ورود به سامانه: " + code;
 
             //TODO: Make Dependency Inversion
+            //TODO: Use SDK
             FetchRequestOptions options = new()
             {
                 Url = $@"{API_KEY}/verify/lookup.json",
-                Params = $@"?receptor={dto.Mobile}&template=&token={code}&template=verify"
+                Params = $@"?receptor={dto.Mobile}&token={code}&template=verify"
             };
             var responce = await _fetch.Get(options);
 
-            if (!responce.Status)
-                return CustomErrors.SendCodeFailed();
+            // FIXME: Uncomment
+            // if (!responce.Status)
+            //     return CustomErrors.SendCodeFailed();
 
             return CustomResults.CodeSent(code);
         }

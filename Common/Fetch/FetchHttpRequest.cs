@@ -14,7 +14,6 @@ namespace Fetch
             _httpClient = httpClientFactory.CreateClient();
         }
 
-
         public FetchHttpRequest(IHttpClientFactory httpClientFactory, FetchClientOptions options)
         {
             AddHeaders(options.Headers);
