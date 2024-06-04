@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OTPService")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+91e7cff9117646e83c9a2da822aedca75d6c57a5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0188fe1d94bc787e06e3b094c435418f5d2b02cd")]
 [assembly: System.Reflection.AssemblyProductAttribute("OTPService")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OTPService")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
