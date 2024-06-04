@@ -11,13 +11,12 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IValidator<SendCodeDto>, SendCodeValidator>();
 builder.Services.AddScoped<IValidator<VerifyCodeDto>, VerifyCodeValidator>();
 // Session
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
+builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Cookie.Name = ".OTPServcie.Session";
-    options.IdleTimeout = TimeSpan.FromMinutes(2);
-    options.Cookie.IsEssential = true;
+    options.Configuration = builder.Configuration.GetSection("Redis:Configuration").Value;
+    options.InstanceName = builder.Configuration.GetSection("Redis:InstanceName").Value;
 });
+
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -25,8 +24,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseSession();
 
 app.UseHttpsRedirection();
 app.MapControllers();

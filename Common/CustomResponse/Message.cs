@@ -1,4 +1,4 @@
-namespace CustomResponce.Models
+namespace CustomResponse.Models
 {
     public class Message
     {

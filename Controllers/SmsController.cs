@@ -1,7 +1,9 @@
-using CustomResponce.Models;
-using Fetch;
+using CustomResponse.Models;
+using FluentValidation.Results;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.IdentityModel.Tokens;
 using OTPService.Common;
 using OTPService.DTOs;
 using OTPService.Services;
@@ -10,37 +12,24 @@ namespace OTPService.Controllers;
 
 [ApiController]
 [Route("[action]")]
-public class SmsController : ControllerBase
+public class SmsController(
+    IDistributedCache cache,
+    IConfiguration configuration,
+    IValidator<SendCodeDto> sendCodeValidator,
+    IValidator<VerifyCodeDto> verifyCodeValidator,
+    IHttpClientFactory httpClientFactory,
+    ILogger<SmsController> logger) : ControllerBase
 {
-    private readonly ILogger<SmsController> _logger;
-    private readonly IValidator<SendCodeDto> _sendCodeValidator;
-    private readonly IValidator<VerifyCodeDto> _verifyCodeValidator;
-    private readonly SmsService _service;
-    private readonly string SESSION_KEY = "Code";
+    private readonly IDistributedCache _cache = cache;
+    private readonly ILogger<SmsController> _logger = logger;
+    private readonly IValidator<SendCodeDto> _sendCodeValidator = sendCodeValidator;
+    private readonly IValidator<VerifyCodeDto> _verifyCodeValidator = verifyCodeValidator;
+    private readonly SmsService _service = new(httpClientFactory, configuration);
 
-
-
-    public SmsController(
-        IValidator<SendCodeDto> sendCodeValidator,
-        IValidator<VerifyCodeDto> verifyCodeValidator,
-        IHttpClientFactory httpClientFactory,
-        ILogger<SmsController> logger)
+    [HttpPost]
+    public async Task<IActionResult> SendCode(SendCodeDto dto)
     {
-        _logger = logger;
-        _sendCodeValidator = sendCodeValidator;
-        _verifyCodeValidator = verifyCodeValidator;
-        _service = new SmsService(httpClientFactory);
-
-    }
-
-    [HttpGet("{mobile}")]
-    public async Task<IActionResult> SendCode(string mobile)
-    {
-        var result = new Result();
-        var dto = new SendCodeDto()
-        {
-            Mobile = mobile,
-        };
+        Result result = new();
 
         try
         {
@@ -56,7 +45,11 @@ public class SmsController : ControllerBase
             string? code = result.Data?.ToString() ?? null;
             if (result.Status && !string.IsNullOrEmpty(code))
             {
-                HttpContext.Session.SetString(SESSION_KEY, code);
+                await _cache.SetStringAsync($"{dto.OrganizationId}_{dto.Mobile}", code, new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
+                });
+
                 // FIXME: Uncomment
                 // result.Data = null;
             }
@@ -71,25 +64,29 @@ public class SmsController : ControllerBase
         }
     }
 
-    [HttpGet("{code}")]
-    public IActionResult VerifyCode(string code)
+    [HttpPost]
+    public async Task<IActionResult> VerifyCode(VerifyCodeDto dto)
     {
-        var result = new Result();
+        Result result = new();
 
         try
         {
-            string? ValidCode = HttpContext.Session.GetString(SESSION_KEY);
-            var dto = new VerifyCodeDto()
+            string? ValidCode = await _cache.GetStringAsync($"{dto.OrganizationId}_{dto.Mobile}");
+            if (ValidCode.IsNullOrEmpty())
             {
-                Code = code,
-                ValidCode = ValidCode
-            };
-
-            var check = _verifyCodeValidator.Validate(dto);
-            if (check.IsValid)
-                result = CustomResults.ValidCode();
-            else
                 result = CustomErrors.InvalidCode();
+                return StatusCode(result.StatusCode, result);
+            }
+
+            ValidationResult check = _verifyCodeValidator.Validate(dto);
+            if (check.IsValid)
+            {
+                result = CustomResults.ValidCode();
+            }
+            else
+            {
+                result = CustomErrors.InvalidCode();
+            }
 
             return StatusCode(result.StatusCode, result);
         }

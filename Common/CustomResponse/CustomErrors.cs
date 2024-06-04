@@ -1,4 +1,4 @@
-using CustomResponce.Models;
+using CustomResponse.Models;
 
 namespace OTPService.Common
 {

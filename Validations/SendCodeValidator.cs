@@ -1,15 +1,18 @@
 using FluentValidation;
 using OTPService.DTOs;
 
-namespace OTPService.Validations {
-    public class SendCodeValidator: AbstractValidator<SendCodeDto>
+namespace OTPService.Validations
+{
+    public class SendCodeValidator : AbstractValidator<SendCodeDto>
     {
         public SendCodeValidator()
         {
-            RuleFor(i => i.Mobile).NotEmpty();
-            RuleFor(i => i.Mobile).NotNull();
-            RuleFor(i => i.Mobile).Length(10, 14);
+            RuleFor(d => d.Mobile).NotEmpty()
+                              .NotNull()
+                              .Matches(@"^(\+98|0)?9\d{9}$")
+                              .WithMessage("شماره وارد شده معتبر نمی باشد!");
+
+            RuleFor(i => i.OrganizationId).NotEmpty().NotNull();
         }
-        
     }
 }

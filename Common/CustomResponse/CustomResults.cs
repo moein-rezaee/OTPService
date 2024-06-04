@@ -1,5 +1,5 @@
 
-using CustomResponce.Models;
+using CustomResponse.Models;
 
 namespace OTPService.Common
 {
@@ -37,7 +37,7 @@ namespace OTPService.Common
             Data = data,
             StatusCode = StatusCodes.Status200OK,
         };
-        
+
         public static Result ValidCode() => new()
         {
             Message = new Message()

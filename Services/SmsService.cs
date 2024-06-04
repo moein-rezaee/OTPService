@@ -1,4 +1,4 @@
-using CustomResponce.Models;
+using CustomResponse.Models;
 using Fetch;
 using OTPService.Common;
 using OTPService.DTOs;
@@ -8,10 +8,12 @@ namespace OTPService.Services
     public class SmsService
     {
 
+        private readonly IConfiguration _config;
         private readonly FetchHttpRequest _fetch;
 
-        public SmsService(IHttpClientFactory httpClientFactory)
+        public SmsService(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
+            _config = config;
             FetchClientOptions fetchClientOptions = new()
             {
                 BaseUrl = "https://api.kavenegar.com/v1/"
@@ -22,12 +24,9 @@ namespace OTPService.Services
 
         public async Task<Result> SendCode(SendCodeDto dto)
         {
-            var result = new Result();
-            var code = new Random().Next(1000, 9999).ToString();
-            //TODO: SetOnConfig
-            const string API_KEY = "51566F5254736B6161375775564279316957454E4F5436527A6E70536756454E";
-            dto.SenderNumber = "10008663";
-            dto.Message = "کد احراز هویت شما جهت ورود به سامانه: " + code;
+            Result result = new();
+            string code = new Random().Next(1000, 9999).ToString();
+            string? API_KEY = _config.GetSection("SMSProvider:API_KEY").Value;
 
             //TODO: Make Dependency Inversion
             //TODO: Use SDK
@@ -36,10 +35,10 @@ namespace OTPService.Services
                 Url = $@"{API_KEY}/verify/lookup.json",
                 Params = $@"?receptor={dto.Mobile}&token={code}&template=verify"
             };
-            var responce = await _fetch.Get(options);
+            Result response = await _fetch.Get(options);
 
             // FIXME: Uncomment
-            // if (!responce.Status)
+            // if (!response.Status)
             //     return CustomErrors.SendCodeFailed();
 
             return CustomResults.CodeSent(code);

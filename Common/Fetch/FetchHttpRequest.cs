@@ -1,5 +1,5 @@
 using System.Text.Json;
-using CustomResponce.Models;
+using CustomResponse.Models;
 using OTPService.Common;
 
 namespace Fetch
@@ -24,15 +24,15 @@ namespace Fetch
 
         public async Task<Result> Get(FetchRequestOptions options)
         {
-            options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ?  _options.BaseUrl : options.BaseUrl; 
+            options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
             AddHeaders(options.Headers);
             var response = await _httpClient.GetAsync(options.FullUrl);
             return GetRequestResult(response);
         }
 
         public async Task<Result> Post(FetchRequestOptions options)
-        {   
-            options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ?  _options.BaseUrl : options.BaseUrl; 
+        {
+            options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
             AddHeaders(options.Headers);
             using var response = await _httpClient.PostAsync(options.FullUrl, options.Content);
             return GetRequestResult(response);
