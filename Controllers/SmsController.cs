@@ -51,7 +51,7 @@ public class SmsController(
                 });
 
                 // FIXME: Uncomment
-                // result.Data = null;
+                result.Data = null;
             }
 
             return StatusCode(result.StatusCode, result);

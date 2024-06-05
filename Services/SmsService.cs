@@ -38,8 +38,8 @@ namespace OTPService.Services
             Result response = await _fetch.Get(options);
 
             // FIXME: Uncomment
-            // if (!response.Status)
-            //     return CustomErrors.SendCodeFailed();
+            if (!response.Status)
+                return CustomErrors.SendCodeFailed();
 
             return CustomResults.CodeSent(code);
         }
