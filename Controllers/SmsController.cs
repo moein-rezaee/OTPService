@@ -40,7 +40,7 @@ public class SmsController(
                 result = CustomErrors.InvalidMobileNumber();
                 return StatusCode(result.StatusCode, result);
             }
-
+            //TODO: Check if is develop mode comment
             result = await _service.SendCode(dto);
             string? code = result.Data?.ToString() ?? null;
             if (result.Status && !string.IsNullOrEmpty(code))
@@ -51,7 +51,8 @@ public class SmsController(
                 });
 
                 // FIXME: Uncomment
-                result.Data = null;
+                //TODO: Check if is develop mode uncomment
+                // result.Data = null;
             }
 
             return StatusCode(result.StatusCode, result);

@@ -26,7 +26,7 @@ namespace OTPService.Services
         {
             Result result = new();
             string code = new Random().Next(1000, 9999).ToString();
-            string? API_KEY = _config.GetSection("SMSProvider:API_KEY").Value;
+            string? API_KEY = _config.GetValue<string>("SMSProvider:API_KEY");
 
             //TODO: Make Dependency Inversion
             //TODO: Use SDK
@@ -38,8 +38,9 @@ namespace OTPService.Services
             Result response = await _fetch.Get(options);
 
             // FIXME: Uncomment
-            if (!response.Status)
-                return CustomErrors.SendCodeFailed();
+            //TODO: Check if is develop mode uncomment
+            // if (!response.Status)
+            //     return CustomErrors.SendCodeFailed();
 
             return CustomResults.CodeSent(code);
         }
