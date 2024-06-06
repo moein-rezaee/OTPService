@@ -17,7 +17,8 @@ pipeline {
         stage('Run') {
             steps {
                 sh 'echo "3. Run Container"'
-                sh 'docker run --name otp -e ASPNETCORE_ENVIRONMENT=Development -p 5254:5254 -dit --rm dotnet-otp:0.0 '
+                sh 'docker rm -f otp'
+                sh 'docker run --name otp -e ASPNETCORE_ENVIRONMENT=Development -p 5254:5254 -dit --rm dotnet-otp:0.0'
             }       
         }
     }
