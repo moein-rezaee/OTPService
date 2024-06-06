@@ -16,6 +16,7 @@ namespace OTPService.Services
             {
                 BaseUrl = "https://api.kavenegar.com/v1/"
             };
+            
             _fetch = new(httpClientFactory, fetchClientOptions);
         }
 
