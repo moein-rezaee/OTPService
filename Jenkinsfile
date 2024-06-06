@@ -1,12 +1,14 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Remove Image') {
             steps {
                 sh 'echo "Deploy Local Test Pipline Started..."'
                 sh 'echo "1. Remove Existing Images"'
                 sh 'docker rmi -f otp'
-            },
+            }
+        },
+        stage('Build Image') {
             steps {
                 sh 'echo "2. Building Docker Image"'
                 sh 'docker build -t dotnet-otp:0.0 .'
