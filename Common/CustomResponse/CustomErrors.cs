@@ -32,7 +32,7 @@ namespace OTPService.Common
         {
             Message = new Message()
             {
-                Fa = " جدید شد خطا هنگام ارسال کد",
+                Fa = "خطا هنگام ارسال کد",
                 En = "BadGateway. Send Code Failed!"
             },
             StatusCode = StatusCodes.Status502BadGateway,

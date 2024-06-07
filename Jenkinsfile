@@ -7,6 +7,7 @@ pipeline {
         GIT_REPO = 'https://github.com/moein-rezaee/OTPService.git' // مسیر مخزن گیت لوکال شما
         // LOCAL_GIT_REPO = '$(pws)/git/repo' // مسیر مخزن گیت لوکال شما
         PROJECT_DIR = './OTPService' // مسیر مخزن گیت لوکال شما
+        ACTIVE_BRANCH = 'main' // مسیر مخزن گیت لوکال شما
         DEV_MODE = 'ASPNETCORE_ENVIRONMENT=Development'
     }
     stages {
@@ -26,6 +27,11 @@ pipeline {
                     script {
                         sh 'echo "Current Directory:"'
                         sh 'pwd'
+                       
+                        sh "git checkout ${ACTIVE_BRANCH} || true"
+                        sh "git fetch --all"
+                        sh "git pull origin ${ACTIVE_BRANCH}"
+                       
                         sh 'echo "Directory Contents:"'
                         sh 'ls -la'
                     }
