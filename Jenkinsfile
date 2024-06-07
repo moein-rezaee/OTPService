@@ -1,25 +1,70 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_IMAGE_NAME = 'dotnet-otp:latest' // نام ایمیج Docker
+        CONTAINER_NAME = 'otp' // نام کانتینر Docker
+        APP_PORT = '5254' // پورت اپلیکیشن
+        GIT_REPO = 'https://github.com/moein-rezaee/OTPService.git' // مسیر مخزن گیت لوکال شما
+        // LOCAL_GIT_REPO = '$(pws)/git/repo' // مسیر مخزن گیت لوکال شما
+        PROJECT_DIR = './OTPService' // مسیر مخزن گیت لوکال شما
+        DEV_MODE = 'ASPNETCORE_ENVIRONMENT=Development'
+    }
     stages {
-        stage('Remove Image') {
+        stage('Show Current Directory') {
             steps {
-                sh 'echo "Deploy Local Test Pipline Started..."'
-                sh 'echo "1. Remove Existing Images"'
-                sh 'docker rmi -f dotnet-otp:0.0'
+                sh 'echo "Current Directory:"'
+                sh 'pwd'
+                sh 'echo "Directory Contents:"'
+                sh 'ls -la'
             }
         }
-        stage('Build Image') {
+        stage('Checkout') {
             steps {
-                sh 'echo "2. Building Docker Image"'
-                sh 'docker build -t dotnet-otp:0.0 .'
+                // چک کردن کد از مخزن گیت لوکال
+                sh "git clone ${GIT_REPO} || true"
+                dir("${PROJECT_DIR}") {
+                    script {
+                        sh 'echo "Current Directory:"'
+                        sh 'pwd'
+                        sh 'echo "Directory Contents:"'
+                        sh 'ls -la'
+                    }
+                }
             }
         }
-        stage('Run') {
+        stage('Remove Old Image') {
             steps {
-                sh 'echo "3. Run Container"'
-                sh 'docker rm -f otp'
-                sh 'docker run --name otp -e ASPNETCORE_ENVIRONMENT=Development -p 5254:5254 -dit --rm dotnet-otp:0.0'
-            }       
+                script {
+                    // پاک کردن کانتینر قبلی در صورت وجود
+                    sh "docker rm -f ${CONTAINER_NAME} || true"
+                    // پاک کردن ایمیج قبلی در صورت وجود
+                    sh "docker rmi -f ${DOCKER_IMAGE_NAME} || true"
+                }
+            }
+        }
+        stage('Build New Image') {
+            steps {
+                dir("${PROJECT_DIR}") {
+                    script {
+                         // ساخت ایمیج جدید
+                        sh "docker build -t ${DOCKER_IMAGE_NAME} ."
+                    }
+                }
+            }
+        }
+        stage('Run New Container') {
+            steps {
+                script {
+                    // ران کردن کانتینر جدید
+                    sh "docker run --name ${CONTAINER_NAME} -e ${DEV_MODE} -p ${APP_PORT}:${APP_PORT} -dit --rm ${DOCKER_IMAGE_NAME}"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // نمایش لاگ کانتینر برای بررسی
+            sh "docker logs ${CONTAINER_NAME} || true"
         }
     }
 }

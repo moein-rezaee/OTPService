@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/moein/moein/projects/dotnet/OTPService/OTPService.csproj": {}
+    "/home/moein/moein/projects/dotnet/HealthPlus/OTPService/OTPService.csproj": {}
   },
   "projects": {
-    "/home/moein/moein/projects/dotnet/OTPService/OTPService.csproj": {
+    "/home/moein/moein/projects/dotnet/HealthPlus/OTPService/OTPService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/moein/moein/projects/dotnet/OTPService/OTPService.csproj",
+        "projectUniqueName": "/home/moein/moein/projects/dotnet/HealthPlus/OTPService/OTPService.csproj",
         "projectName": "OTPService",
-        "projectPath": "/home/moein/moein/projects/dotnet/OTPService/OTPService.csproj",
+        "projectPath": "/home/moein/moein/projects/dotnet/HealthPlus/OTPService/OTPService.csproj",
         "packagesPath": "/home/moein/.nuget/packages/",
-        "outputPath": "/home/moein/moein/projects/dotnet/OTPService/obj/",
+        "outputPath": "/home/moein/moein/projects/dotnet/HealthPlus/OTPService/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/moein/.nuget/NuGet/NuGet.Config"
@@ -76,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.105/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
