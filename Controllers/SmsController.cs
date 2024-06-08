@@ -33,16 +33,16 @@ public class SmsController(
 
         try
         {
-            //Validation
-            var check = _sendCodeValidator.Validate(dto);
+            ValidationResult check = _sendCodeValidator.Validate(dto);
             if (!check.IsValid)
             {
                 result = CustomErrors.InvalidMobileNumber();
                 return StatusCode(result.StatusCode, result);
             }
-            //TODO: Check if is develop mode comment
+
             result = await _service.SendCode(dto);
-            string? code = result.Data?.ToString() ?? null;
+            string? code = result.Data?.ToString();
+
             if (result.Status && !string.IsNullOrEmpty(code))
             {
                 await _cache.SetStringAsync($"{dto.OrganizationId}_{dto.Mobile}", code, new DistributedCacheEntryOptions
@@ -50,16 +50,15 @@ public class SmsController(
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
                 });
 
-                // FIXME: Uncomment
-                //TODO: Check if is develop mode uncomment
-                // result.Data = null;
+                // FIXME: Uncomment if in develop mode
+                result.Data = null;
             }
 
             return StatusCode(result.StatusCode, result);
         }
         catch (Exception e)
         {
-            _logger.LogInformation(e.Message);
+            _logger.LogError(e, "Error occurred while sending code.");
             result = CustomErrors.SendCodeServerError();
             return StatusCode(result.StatusCode, result);
         }

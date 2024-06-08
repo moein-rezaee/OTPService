@@ -39,8 +39,8 @@ namespace OTPService.Services
 
             // FIXME: Uncomment
             //TODO: Check if is develop mode uncomment
-            // if (!response.Status)
-            //     return CustomErrors.SendCodeFailed();
+            if (!response.Status)
+                return CustomErrors.SendCodeFailed();
 
             return CustomResults.CodeSent(code);
         }
