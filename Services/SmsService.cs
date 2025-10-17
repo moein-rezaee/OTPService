@@ -1,46 +1,47 @@
-using CustomResponce.Models;
-using Fetch;
-using OTPService.Common;
 using OTPService.DTOs;
+using SmsExtension.Core;
+using Microsoft.Extensions.Logging;
 
 namespace OTPService.Services
 {
     public class SmsService
     {
+        private readonly ISmsProvider _smsProvider;
+        private readonly ILogger<SmsService> _logger;
 
-        private readonly FetchHttpRequest _fetch;
-
-        public SmsService(IHttpClientFactory httpClientFactory)
+        public SmsService(ISmsProvider smsProvider, ILogger<SmsService> logger)
         {
-            FetchClientOptions fetchClientOptions = new()
-            {
-                BaseUrl = "https://api.kavenegar.com/v1/"
-            };
-            _fetch = new(httpClientFactory, fetchClientOptions);
+            _smsProvider = smsProvider;
+            _logger = logger;
         }
 
 
-        public async Task<Result> SendCode(SendCodeDto dto)
+        public async Task<string> SendCode(SendCodeDto dto)
         {
-            var result = new Result();
             var code = new Random().Next(1000, 9999).ToString();
-            //TODO: SetOnConfig
-            const string API_KEY = "51566F5254736B6161375775564279316957454E4F5436527A6E70536756454E";
-            dto.SenderNumber = "10008663";
-            dto.Message = "کد احراز هویت شما جهت ورود به سامانه: " + code;
+            dto.Message = string.IsNullOrWhiteSpace(dto.Message)
+                ? "کد احراز هویت شما جهت ورود به سامانه: " + code
+                : dto.Message;
 
-            //TODO: Make Dependency Inversion
-            FetchRequestOptions options = new()
+            if (string.IsNullOrWhiteSpace(dto.Mobile) || string.IsNullOrWhiteSpace(dto.Message))
             {
-                Url = $@"{API_KEY}/sms/send.json",
-                Params = $@"?receptor={dto.Mobile}&sender={dto.SenderNumber}&message={dto.Message}"
-            };
-            var responce = await _fetch.Get(options);
+                _logger.LogWarning("Invalid SMS input. Mobile or Message is empty");
+                throw new ArgumentException("Mobile and Message are required");
+            }
 
-            if (!responce.Status)
-                return CustomErrors.SendCodeFailed();
+            var sendResult = await _smsProvider.SendAsync(new SmsMessage
+            {
+                Mobile = dto.Mobile,
+                Text = dto.Message
+            });
 
-            return CustomResults.CodeSent(code);
+            if (!sendResult.Success)
+            {
+                _logger.LogError("SMS send failed for {Mobile}: {Error}", dto.Mobile, sendResult.ErrorMessage);
+                throw new InvalidOperationException("SMS send failed");
+            }
+
+            return code;
         }
     }
 }
