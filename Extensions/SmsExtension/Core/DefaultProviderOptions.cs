@@ -2,6 +2,5 @@ namespace SmsExtension.Core;
 
 public class DefaultProviderOptions
 {
-    public string DefaultProvider { get; set; } = "Kavenegar";
+    public string DefaultProvider { get; set; } = "Farapayamak";
 }
-

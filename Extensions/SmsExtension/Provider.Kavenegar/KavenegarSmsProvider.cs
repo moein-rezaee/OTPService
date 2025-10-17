@@ -2,6 +2,7 @@ using Kavenegar.Core.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SmsExtension.Core;
+using SmsExtension.Abstractions;
 
 namespace SmsExtension.Provider.Kavenegar;
 

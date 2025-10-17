@@ -1,20 +1,27 @@
 using OTPService.DTOs;
 using SmsExtension.Core;
+using SmsExtension.Abstractions;
+using CacheExtension.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace OTPService.Services
 {
-    public class SmsService
+    public class OtpManager
     {
         private readonly ISmsProvider _smsProvider;
-        private readonly ILogger<SmsService> _logger;
+        private readonly ICacheService _cache;
+        private readonly ILogger<OtpManager> _logger;
+        private static readonly TimeSpan OtpTtl = TimeSpan.FromMinutes(2);
 
-        public SmsService(ISmsProvider smsProvider, ILogger<SmsService> logger)
+        public OtpManager(
+            ISmsProvider smsProvider,
+            ICacheService cache,
+            ILogger<OtpManager> logger)
         {
             _smsProvider = smsProvider;
+            _cache = cache;
             _logger = logger;
         }
-
 
         public async Task<string> SendCode(SendCodeDto dto)
         {
@@ -22,13 +29,7 @@ namespace OTPService.Services
             dto.Message = string.IsNullOrWhiteSpace(dto.Message)
                 ? "کد احراز هویت شما جهت ورود به سامانه: " + code
                 : dto.Message;
-
-            if (string.IsNullOrWhiteSpace(dto.Mobile) || string.IsNullOrWhiteSpace(dto.Message))
-            {
-                _logger.LogWarning("Invalid SMS input. Mobile or Message is empty");
-                throw new ArgumentException("Mobile and Message are required");
-            }
-
+            
             var sendResult = await _smsProvider.SendAsync(new SmsMessage
             {
                 Mobile = dto.Mobile,
@@ -41,7 +42,15 @@ namespace OTPService.Services
                 throw new InvalidOperationException("SMS send failed");
             }
 
+            await _cache.SetAsync($"otp:{dto.Mobile}", code, OtpTtl);
             return code;
+        }
+
+        public async Task<bool> VerifyCode(string mobile, string code)
+        {
+            var validCode = await _cache.GetAsync<string>($"otp:{mobile}");
+            var isValid = string.Equals(code, validCode, StringComparison.Ordinal);
+            return isValid;
         }
     }
 }

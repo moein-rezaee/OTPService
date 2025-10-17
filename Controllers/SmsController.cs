@@ -2,7 +2,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using OTPService.DTOs;
 using OTPService.Services;
-using CacheExtension.Abstractions;
 
 namespace OTPService.Controllers;
 
@@ -12,24 +11,21 @@ public class SmsController : ControllerBase
 {
     private readonly ILogger<SmsController> _logger;
     private readonly IValidator<SendCodeDto> _sendCodeValidator;
-    private readonly IValidator<VerifyCodeDto> _verifyCodeValidator;
-    private readonly SmsService _service;
-    private readonly ICacheService _cache;
+    private readonly IValidator<VerifyCodeRequestDto> _verifyCodeRequestValidator;
+    private readonly OtpManager _service;
 
 
 
     public SmsController(
         IValidator<SendCodeDto> sendCodeValidator,
-        IValidator<VerifyCodeDto> verifyCodeValidator,
-        SmsService service,
-        ICacheService cache,
+        IValidator<VerifyCodeRequestDto> verifyCodeRequestValidator,
+        OtpManager service,
         ILogger<SmsController> logger)
     {
         _logger = logger;
         _sendCodeValidator = sendCodeValidator;
-        _verifyCodeValidator = verifyCodeValidator;
+        _verifyCodeRequestValidator = verifyCodeRequestValidator;
         _service = service;
-        _cache = cache;
 
     }
 
@@ -46,9 +42,7 @@ public class SmsController : ControllerBase
             // Validation via FluentValidation
             _sendCodeValidator.ValidateAndThrow(dto);
 
-            var code = await _service.SendCode(dto);
-            if (!string.IsNullOrEmpty(code))
-                await _cache.SetAsync($"otp:{mobile}", code, TimeSpan.FromMinutes(2));
+            await _service.SendCode(dto);
 
             return Ok(new { message = "Code sent" });
         }
@@ -64,17 +58,10 @@ public class SmsController : ControllerBase
     {
         try
         {
-            string? ValidCode = await _cache.GetAsync<string>($"otp:{mobile}");
-            var dto = new VerifyCodeDto()
-            {
-                Code = code,
-                ValidCode = ValidCode
-            };
+            // Validate inputs using a single DTO
+            _verifyCodeRequestValidator.ValidateAndThrow(new VerifyCodeRequestDto { Mobile = mobile, Code = code });
 
-            // Validation via FluentValidation
-            _verifyCodeValidator.ValidateAndThrow(dto);
-
-            bool isValid = string.Equals(dto.Code, dto.ValidCode, StringComparison.Ordinal);
+            bool isValid = await _service.VerifyCode(mobile, code);
             if (!isValid)
                 return BadRequest(new { error = "Invalid code" });
 
