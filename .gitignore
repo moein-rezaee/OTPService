@@ -1,4 +1,59 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Rr]elease*/
+[Dd]ebug*/
+[Aa]rtifacts/
+[Oo]ut/
+
+# IDEs and tooling
+.vs/
+.idea/
+.vscode/
+_ReSharper*/
+*.DotSettings.user
+.ionide/
+
+# Test results
+TestResults/
+TestResult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/packages/
+packages/
+
+# Logs
+logs/
+*.log
+
+# Publish outputs
+publish/
+wwwroot/lib/
+
+# JavaScript assets (for SPA/frontends in solution)
+node_modules/
+dist/
+
+# Keep solution files tracked
+!*.sln
+
 bin
+bin/*
 obj
-*.sln
-.vscode
+obj/*
