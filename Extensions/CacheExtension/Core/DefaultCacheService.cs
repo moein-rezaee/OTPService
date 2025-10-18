@@ -22,7 +22,7 @@ public class DefaultCacheService : ICacheService
         ILogger<DefaultCacheService> logger)
     {
         _logger = logger;
-        var provider = options.Value.DefaultProvider?.Trim() ?? "Redis";
+        var provider = options.Value.DefaultProvider?.Trim() ?? "Memory";
         _logger.LogDebug("Selecting Cache provider: {Provider}", provider);
         _inner = provider.Equals("Redis", StringComparison.OrdinalIgnoreCase) ? (ICacheService)redis : memory;
     }

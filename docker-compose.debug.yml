@@ -4,7 +4,8 @@ version: '3.4'
 
 services:
   otpservice:
-    image: otpservice
+    image: otp-service:0.0.0
+    container_name: otp-service
     build:
       context: .
       dockerfile: ./Dockerfile
