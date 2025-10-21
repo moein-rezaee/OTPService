@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\OTPService.Domain\OTPService.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\SmsProvider\SmsProvider.csproj" />
+    <ProjectReference Include="..\..\..\Shared\CacheService\CacheService.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
