@@ -1,8 +1,5 @@
-using CustomResponce.Models;
-using Fetch;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using OTPService.Common;
 using OTPService.DTOs;
 using OTPService.Services;
 
@@ -14,29 +11,27 @@ public class SmsController : ControllerBase
 {
     private readonly ILogger<SmsController> _logger;
     private readonly IValidator<SendCodeDto> _sendCodeValidator;
-    private readonly IValidator<VerifyCodeDto> _verifyCodeValidator;
-    private readonly SmsService _service;
-    private readonly string SESSION_KEY = "Code";
+    private readonly IValidator<VerifyCodeRequestDto> _verifyCodeRequestValidator;
+    private readonly OtpManager _service;
 
 
 
     public SmsController(
         IValidator<SendCodeDto> sendCodeValidator,
-        IValidator<VerifyCodeDto> verifyCodeValidator,
-        IHttpClientFactory httpClientFactory,
+        IValidator<VerifyCodeRequestDto> verifyCodeRequestValidator,
+        OtpManager service,
         ILogger<SmsController> logger)
     {
         _logger = logger;
         _sendCodeValidator = sendCodeValidator;
-        _verifyCodeValidator = verifyCodeValidator;
-        _service = new SmsService(httpClientFactory);
+        _verifyCodeRequestValidator = verifyCodeRequestValidator;
+        _service = service;
 
     }
 
     [HttpGet("{mobile}")]
     public async Task<IActionResult> SendCode(string mobile)
     {
-        var result = new Result();
         var dto = new SendCodeDto()
         {
             Mobile = mobile,
@@ -44,59 +39,38 @@ public class SmsController : ControllerBase
 
         try
         {
-            //Validation
-            var check = _sendCodeValidator.Validate(dto);
-            if (!check.IsValid)
-            {
-                result = CustomErrors.InvalidMobileNumber();
-                return StatusCode(result.StatusCode, result);
-            }
+            // Validation via FluentValidation
+            _sendCodeValidator.ValidateAndThrow(dto);
 
-            result = await _service.SendCode(dto);
-            string? code = result.Data?.ToString() ?? null;
-            if (result.Status && !string.IsNullOrEmpty(code))
-            {
-                HttpContext.Session.SetString(SESSION_KEY, code);
-                result.Data = null;
-            }
+            await _service.SendCode(dto);
 
-            return StatusCode(result.StatusCode, result);
+            return Ok(new { message = "Code sent" });
         }
         catch (Exception e)
         {
-            _logger.LogInformation(e.Message);
-            result = CustomErrors.SendCodeServerError();
-            return StatusCode(result.StatusCode, result);
+            _logger.LogError(e, "SendCode failed for {Mobile}", mobile);
+            throw;
         }
     }
 
-    [HttpGet("{code}")]
-    public IActionResult VerifyCode(string code)
+    [HttpGet("{mobile}/{code}")]
+    public async Task<IActionResult> VerifyCode(string mobile, string code)
     {
-        var result = new Result();
-
         try
         {
-            string? ValidCode = HttpContext.Session.GetString(SESSION_KEY);
-            var dto = new VerifyCodeDto()
-            {
-                Code = code,
-                ValidCode = ValidCode
-            };
+            // Validate inputs using a single DTO
+            _verifyCodeRequestValidator.ValidateAndThrow(new VerifyCodeRequestDto { Mobile = mobile, Code = code });
 
-            var check = _verifyCodeValidator.Validate(dto);
-            if (check.IsValid)
-                result = CustomResults.ValidCode();
-            else
-                result = CustomErrors.InvalidCode();
+            bool isValid = await _service.VerifyCode(mobile, code);
+            if (!isValid)
+                return BadRequest(new { error = "Invalid code" });
 
-            return StatusCode(result.StatusCode, result);
+            return Ok(new { message = "Valid code" });
         }
         catch (Exception e)
         {
-            _logger.LogInformation(e.Message);
-            result = CustomErrors.VerifyCodeServerError();
-            return StatusCode(result.StatusCode, result);
+            _logger.LogError(e, "VerifyCode failed");
+            throw;
         }
     }
 }
