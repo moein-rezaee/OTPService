@@ -7,8 +7,8 @@ services:
     image: otp-service:0.0.0
     container_name: otp-service
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: ./OTPService/Dockerfile
       args:
         - configuration=Debug
     ports:
@@ -17,3 +17,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
+      - ./data/.env:/app/.env:ro
+      - ./data/appsettings.json:/app/appsettings.json:ro
+      - ./data/appsettings.Development.json:/app/appsettings.Development.json:ro
