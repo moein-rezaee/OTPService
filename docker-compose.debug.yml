@@ -1,22 +1,31 @@
-# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
-
-version: '3.4'
-
 services:
   otpservice:
     image: otp-service:0.0.0
     container_name: otp-service
     build:
-      context: ..
-      dockerfile: ./OTPService/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       args:
         - configuration=Debug
     ports:
       - 5254:5254
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - REDIS_ENDPOINT=redis
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
-      - ./data/.env:/app/.env:ro
       - ./data/appsettings.json:/app/appsettings.json:ro
       - ./data/appsettings.Development.json:/app/appsettings.Development.json:ro
+      - ./.env:/app/.env:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

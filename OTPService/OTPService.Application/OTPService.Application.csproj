@@ -2,8 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OTPService.Domain\OTPService.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Shared\CacheService\CacheService.csproj" />
-    <ProjectReference Include="..\..\..\Shared\SmsProvider\SmsProvider.csproj" />
+    <ProjectReference Include="../../Shared/CacheService/CacheService.csproj" />
+    <ProjectReference Include="../../Shared/SmsProvider/SmsProvider.csproj" />
   </ItemGroup>
 
   <ItemGroup>

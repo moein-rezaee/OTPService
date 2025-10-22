@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Shared\CacheService\CacheService.csproj" />
-    <ProjectReference Include="..\..\..\Shared\SmsProvider\SmsProvider.csproj" />
+    <ProjectReference Include="../../Shared/CacheService/CacheService.csproj" />
+    <ProjectReference Include="../../Shared/SmsProvider/SmsProvider.csproj" />
   </ItemGroup>
 
   <ItemGroup>
