@@ -148,13 +148,25 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure Swagger UI
-app.UseSwagger();
+// Configure Swagger and SwaggerUI for all environments
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "swagger/{documentName}/swagger.json";
+});
+
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "OTP Service API");
-    options.RoutePrefix = string.Empty; // To serve the Swagger UI at the app's root
+    options.SwaggerEndpoint("./swagger/v1/swagger.json", "OTP Service API v1");
+    options.RoutePrefix = "swagger";
+    options.DocumentTitle = "OTP Service API Documentation";
+    options.DefaultModelsExpandDepth(-1);
 });
+
+// Enable developer exception page in Development
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseHttpsRedirection();
 app.UseCors();

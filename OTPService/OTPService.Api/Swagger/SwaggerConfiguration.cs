@@ -8,6 +8,7 @@ public static class SwaggerConfiguration
 {
     public static void ConfigureSwagger(this SwaggerGenOptions options)
     {
+        // Configure Swagger document
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Title = "OTP Service API",
@@ -23,6 +24,16 @@ public static class SwaggerConfiguration
                 Name = "MIT",
                 Url = new Uri("https://opensource.org/licenses/MIT")
             }
+        });
+        
+        // Add security definitions and requirements if needed
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme.",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
         });
 
         // Enable annotations for all controllers
