@@ -24,7 +24,9 @@ COPY . .
 
 # Build and publish
 WORKDIR /src/OTPService/OTPService.Api
-RUN dotnet publish --no-restore -c Release -o /app/publish
+RUN dotnet publish --no-restore -c Release -o /app/publish \
+    /p:GenerateDocumentationFile=true \
+    /p:DocumentationFile=/app/publish/OTPService.Api.xml
 
 FROM base AS final
 USER app

@@ -9,11 +9,13 @@ services:
       - 5254:5254
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - REDIS_ENDPOINT=redis
+      - ASPNETCORE_URLS=http://+:5254
+      # Cache Settings
+      - REDIS_USERNAME=default
+      - REDIS_PASSWORD=your-redis-password-here
     volumes:
-      - ./data/appsettings.json:/app/appsettings.json:ro
-      - ./data/appsettings.Development.json:/app/appsettings.Development.json:ro
-      - ./.env:/app/.env:ro
+      - ./OTPService/OTPService.Api/appsettings.json:/app/appsettings.json:ro
+      - ./OTPService/OTPService.Api/.env:/app/.env:ro
     depends_on:
       - redis
 

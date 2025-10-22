@@ -4,12 +4,16 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using StackExchange.Redis;
+using DotNetEnv;
+using MediatR;
 using Shared.CacheService.Abstractions;
 using Shared.CacheService.Core;
 using Shared.CacheService.Memory;
@@ -24,7 +28,6 @@ using ApplicationService = OTPService.Application.Features.OTP.Services;
 using OTPService.Domain.Interfaces;
 using OTPService.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using StackExchange.Redis;
 using Serilog;
 
 // Load Environment Variables
@@ -32,11 +35,10 @@ DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure environment-specific settings
+// Configure settings
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Configure Logging
@@ -52,8 +54,6 @@ using var loggerFactory = LoggerFactory.Create(builder =>
 var logger = loggerFactory.CreateLogger<Program>();
 
 // Add API configuration
-builder.Services.AddControllers();
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -149,21 +149,17 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure Swagger UI
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "OTP Service API");
-        options.RoutePrefix = string.Empty; // To serve the Swagger UI at the app's root
-    });
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "OTP Service API");
+    options.RoutePrefix = string.Empty; // To serve the Swagger UI at the app's root
+});
 
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthorization();
 
-app.MapControllers()
-   .RequireAuthorization();
+app.MapControllers();
 
 app.Run();
