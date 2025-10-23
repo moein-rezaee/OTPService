@@ -1,8 +1,7 @@
-namespace Shared.SmsProvider.Core
+namespace SmsExtension.Core;
+
+public enum SmsProviderKind
 {
-    public enum SmsProviderKind
-    {
-        Kavenegar,
-        Farapayamak
-    }
+    Kavenegar,
+    Farapayamak
 }

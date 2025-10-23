@@ -1,17 +1,15 @@
-namespace Shared.SmsProvider.Core
+namespace SmsExtension.Core;
+
+public class SmsResult
 {
-    public class SmsResult
-    {
-        public bool Success { get; private set; }
-        public string Message { get; private set; }
+    public bool Success { get; private set; }
+    public string? MessageId { get; private set; }
+    public string? ErrorCode { get; private set; }
+    public string? ErrorMessage { get; private set; }
 
-        private SmsResult(bool success, string message)
-        {
-            Success = success;
-            Message = message;
-        }
+    public static SmsResult Ok(string? messageId = null)
+        => new SmsResult { Success = true, MessageId = messageId };
 
-        public static SmsResult Ok(string messageId) => new(true, messageId);
-        public static SmsResult Fail(string error) => new(false, error);
-    }
+    public static SmsResult Fail(string? errorMessage = null, string? errorCode = null)
+        => new SmsResult { Success = false, ErrorMessage = errorMessage, ErrorCode = errorCode };
 }

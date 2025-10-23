@@ -1,33 +1,35 @@
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using Microsoft.Extensions.Options;
-using Shared.CacheService.Abstractions;
-using Shared.CacheService.Memory;
-using Shared.CacheService.Redis;
+using CacheExtension.Abstractions;
+using CacheExtension.Memory;
+using CacheExtension.Redis;
 
-using System;
-using Shared.CacheService.Core;
+namespace CacheExtension.Core;
 
-namespace Shared.CacheService.Core
+public class CacheServiceFactory : ICacheServiceFactory
 {
-    public class CacheServiceFactory : ICacheServiceFactory
+    private readonly DefaultCacheOptions _options;
+    private readonly MemoryCacheService _memory;
+    private readonly RedisCacheService _redis;
+
+    public CacheServiceFactory(
+        IOptions<DefaultCacheOptions> options,
+        MemoryCacheService memory,
+        RedisCacheService redis)
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly DefaultCacheOptions _options;
-
-        public CacheServiceFactory(IServiceProvider serviceProvider, IOptions<DefaultCacheOptions> options)
-        {
-            _serviceProvider = serviceProvider;
-            _options = options.Value;
-        }
-
-        public ICacheService Create(CacheProviderKind kind)
-        {
-            return kind switch
-            {
-                CacheProviderKind.Memory => ActivatorUtilities.CreateInstance<MemoryCacheService>(_serviceProvider),
-                CacheProviderKind.Redis => ActivatorUtilities.CreateInstance<RedisCacheService>(_serviceProvider),
-                _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unsupported cache provider")
-            };
-        }
+        _options = options.Value;
+        _memory = memory;
+        _redis = redis;
     }
+
+    public ICacheService GetDefault() => MapNameToKind(_options.DefaultProvider) == CacheProviderKind.Redis ? _redis : _memory;
+
+    public ICacheService Get(CacheProviderKind kind) => kind == CacheProviderKind.Redis ? _redis : _memory;
+
+    public IEnumerable<ICacheService> GetAll() => new ICacheService[] { _redis, _memory };
+
+    private static CacheProviderKind MapNameToKind(string? name)
+        => (name ?? string.Empty).Trim().Equals("Redis", System.StringComparison.OrdinalIgnoreCase)
+            ? CacheProviderKind.Redis
+            : CacheProviderKind.Memory;
 }

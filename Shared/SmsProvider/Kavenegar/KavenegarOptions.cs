@@ -1,13 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace Shared.SmsProvider.Kavenegar
+namespace SmsExtension.Provider.Kavenegar;
+
+public class KavenegarOptions
 {
-    public class KavenegarOptions
-    {
-        [Required(ErrorMessage = "Kavenegar API key is required")]
-        public string ApiKey { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Kavenegar sender number is required")]
-        public string Sender { get; set; } = string.Empty;
-    }
+    public string ApiKey { get; set; } = string.Empty;
+    public string Sender { get; set; } = string.Empty;
 }

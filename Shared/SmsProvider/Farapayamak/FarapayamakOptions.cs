@@ -1,22 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Options;
-using Shared.SmsProvider.Core;
-using Shared.SmsProvider.Abstractions;
+using System;
 
-namespace Shared.SmsProvider.Farapayamak
+namespace SmsExtension.Provider.Farapayamak;
+
+public class FarapayamakOptions
 {
-    public class FarapayamakOptions
-    {
-        [Required(ErrorMessage = "Farapayamak API key is required")]
-        public string ApiKey { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Farapayamak username is required")]
-        public string Username { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Farapayamak password is required")]
-        public string Password { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Farapayamak sender number is required")]
-        public string Sender { get; set; } = string.Empty;
-    }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string From { get; set; } = string.Empty;
 }

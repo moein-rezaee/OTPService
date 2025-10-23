@@ -1,8 +1,7 @@
-namespace Shared.CacheService.Core
+namespace CacheExtension.Core;
+
+public enum CacheProviderKind
 {
-    public enum CacheProviderKind
-    {
-        Memory,
-        Redis
-    }
+    Redis,
+    Memory
 }

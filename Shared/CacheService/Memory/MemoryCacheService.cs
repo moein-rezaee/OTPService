@@ -1,43 +1,45 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Shared.CacheService.Abstractions;
+using CacheExtension.Abstractions;
 
-namespace Shared.CacheService.Memory
+namespace CacheExtension.Memory;
+
+public class MemoryCacheService : ICacheService
 {
-    public class MemoryCacheService : ICacheService
+    private readonly IMemoryCache _cache;
+
+    public MemoryCacheService(IMemoryCache cache)
     {
-        private readonly IMemoryCache _memoryCache;
+        _cache = cache;
+    }
 
-        public MemoryCacheService(IMemoryCache memoryCache)
+    public Task SetAsync<T>(string key, T value, TimeSpan ttl, CancellationToken cancellationToken = default)
+    {
+        var options = new MemoryCacheEntryOptions
         {
-            _memoryCache = memoryCache;
-        }
+            AbsoluteExpirationRelativeToNow = ttl
+        };
+        _cache.Set(key, value, options);
+        return Task.CompletedTask;
+    }
 
-        public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(_memoryCache.TryGetValue(key, out T? value) ? value : default);
-        }
+    public Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+    {
+        _cache.TryGetValue(key, out T? value);
+        return Task.FromResult(value);
+    }
 
-        public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
-        {
-            var options = new MemoryCacheEntryOptions();
-            if (expiry.HasValue)
-            {
-                options.AbsoluteExpirationRelativeToNow = expiry.Value;
-            }
+    public Task<bool> RemoveAsync(string key, CancellationToken cancellationToken = default)
+    {
+        _cache.Remove(key);
+        return Task.FromResult(true);
+    }
 
-            _memoryCache.Set(key, value, options);
-            return Task.CompletedTask;
-        }
-
-        public Task RemoveAsync(string key, CancellationToken cancellationToken = default)
-        {
-            _memoryCache.Remove(key);
-            return Task.CompletedTask;
-        }
-
-        public Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(_memoryCache.TryGetValue(key, out _));
-        }
+    public Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
+    {
+        var exists = _cache.TryGetValue(key, out _);
+        return Task.FromResult(exists);
     }
 }

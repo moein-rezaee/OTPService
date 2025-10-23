@@ -1,8 +1,6 @@
-namespace Shared.CacheService.Core
+namespace CacheExtension.Core;
+
+public class DefaultCacheOptions
 {
-    public class DefaultCacheOptions
-    {
-        public CacheProviderKind DefaultProvider { get; set; } = CacheProviderKind.Memory;
-        public int DefaultExpirationMinutes { get; set; } = 5;
-    }
+    public string DefaultProvider { get; set; } = "Memory"; // or "Memory"
 }

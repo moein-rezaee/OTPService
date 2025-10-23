@@ -1,11 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Shared.SmsProvider.Core;
+using SmsExtension.Core;
 
-namespace Shared.SmsProvider.Abstractions
+namespace SmsExtension.Abstractions;
+
+public interface ISmsProvider
 {
-    public interface ISmsProvider
-    {
-        Task<SmsResult> SendAsync(SmsMessage message, CancellationToken cancellationToken = default);
-    }
+    Task<SmsResult> SendAsync(SmsMessage message, CancellationToken cancellationToken = default);
 }

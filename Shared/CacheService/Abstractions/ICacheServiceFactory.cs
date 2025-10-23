@@ -1,9 +1,11 @@
-using Shared.CacheService.Core;
+using CacheExtension.Core;
+using System.Collections.Generic;
 
-namespace Shared.CacheService.Abstractions
+namespace CacheExtension.Abstractions;
+
+public interface ICacheServiceFactory
 {
-    public interface ICacheServiceFactory
-    {
-        ICacheService Create(CacheProviderKind kind);
-    }
+    ICacheService GetDefault();
+    ICacheService Get(CacheProviderKind kind);
+    IEnumerable<ICacheService> GetAll();
 }

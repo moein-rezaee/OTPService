@@ -1,9 +1,6 @@
-using Shared.SmsProvider.Core;
+namespace SmsExtension.Core;
 
-namespace Shared.SmsProvider.Core
+public class DefaultProviderOptions
 {
-    public class DefaultProviderOptions
-    {
-        public SmsProviderKind DefaultProvider { get; set; }
-    }
+    public string DefaultProvider { get; set; } = "Farapayamak";
 }

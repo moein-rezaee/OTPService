@@ -13,7 +13,6 @@ public class SwaggerDefaultValues : IOperationFilter
     {
         var apiDescription = context.ApiDescription;
 
-        // RESTful conventions in responses
         if (operation.Responses.Count == 0)
         {
             operation.Responses.Add("200", new OpenApiResponse { Description = "عملیات با موفقیت انجام شد" });
