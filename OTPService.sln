@@ -5,19 +5,19 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4DE4724D-09DE-4FE0-8FCC-249708AD0528}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Api", "OTPService\OTPService.Api\OTPService.Api.csproj", "{1A04D485-F949-4E5F-B7F2-61491C348D0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Api", "src\OTPService.Api\OTPService.Api.csproj", "{1A04D485-F949-4E5F-B7F2-61491C348D0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Application", "OTPService\OTPService.Application\OTPService.Application.csproj", "{2A494237-7161-4D2C-9445-41AD88ED544B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Application", "src\OTPService.Application\OTPService.Application.csproj", "{2A494237-7161-4D2C-9445-41AD88ED544B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Domain", "OTPService\OTPService.Domain\OTPService.Domain.csproj", "{DAA930CF-0573-4E54-9566-48D69E78589A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Domain", "src\OTPService.Domain\OTPService.Domain.csproj", "{DAA930CF-0573-4E54-9566-48D69E78589A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Infrastructure", "OTPService\OTPService.Infrastructure\OTPService.Infrastructure.csproj", "{E2492E98-CC68-4242-84A6-72A5D579FB8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTPService.Infrastructure", "src\OTPService.Infrastructure\OTPService.Infrastructure.csproj", "{E2492E98-CC68-4242-84A6-72A5D579FB8C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{3CCE1807-683D-4ECC-913A-F602954C34F5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{3CCE1807-683D-4ECC-913A-F602954C34F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService", "Shared\CacheService\CacheService.csproj", "{E66BF65C-42AA-43E4-A723-2CEE1262DF83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService", "shared\CacheService\CacheService.csproj", "{E66BF65C-42AA-43E4-A723-2CEE1262DF83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmsProvider", "Shared\SmsProvider\SmsProvider.csproj", "{AF570FEF-C858-433C-8F2F-E525F010D2A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmsProvider", "shared\SmsProvider\SmsProvider.csproj", "{AF570FEF-C858-433C-8F2F-E525F010D2A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

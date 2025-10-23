@@ -18,12 +18,12 @@
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.4" />
@@ -34,8 +34,8 @@
   <ItemGroup>
     <ProjectReference Include="..\OTPService.Application\OTPService.Application.csproj" />
     <ProjectReference Include="..\OTPService.Infrastructure\OTPService.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Shared\CacheService\CacheService.csproj" />
-    <ProjectReference Include="..\..\Shared\SmsProvider\SmsProvider.csproj" />
+    <ProjectReference Include="..\..\shared\CacheService\CacheService.csproj" />
+    <ProjectReference Include="..\..\shared\SmsProvider\SmsProvider.csproj" />
     <ProjectReference Include="..\OTPService.Domain\OTPService.Domain.csproj" />
   </ItemGroup>
 

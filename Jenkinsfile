@@ -6,7 +6,7 @@ pipeline {
         APP_PORT = '5254' // پورت اپلیکیشن
         GIT_REPO = 'https://github.com/moein-rezaee/OTPService.git' // مسیر مخزن گیت لوکال شما
         // LOCAL_GIT_REPO = '$(pws)/git/repo' // مسیر مخزن گیت لوکال شما
-        PROJECT_DIR = './OTPService' // مسیر مخزن گیت لوکال شما
+        PROJECT_DIR = './src' // مسیر مخزن گیت لوکال شما
         ACTIVE_BRANCH = 'main' // مسیر مخزن گیت لوکال شما
         DEV_MODE = 'ASPNETCORE_ENVIRONMENT=Development'
     }

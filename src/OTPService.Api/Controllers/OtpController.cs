@@ -6,7 +6,7 @@ using OTPService.Application.Features.OTP.Commands.VerifyCode;
 namespace OTPService.Api.Controllers;
 
 [ApiController]
-[Route("Api/[controller]")]
+[Route("api/[controller]")]
 [Produces("application/json")]
 public class OtpController : ControllerBase
 {

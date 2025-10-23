@@ -9,21 +9,21 @@ WORKDIR /src
 
 # Copy all files
 COPY ["OTPService.sln", "."]
-COPY ["OTPService/OTPService.Api/OTPService.Api.csproj", "OTPService/OTPService.Api/"]
-COPY ["OTPService/OTPService.Application/OTPService.Application.csproj", "OTPService/OTPService.Application/"]
-COPY ["OTPService/OTPService.Domain/OTPService.Domain.csproj", "OTPService/OTPService.Domain/"]
-COPY ["OTPService/OTPService.Infrastructure/OTPService.Infrastructure.csproj", "OTPService/OTPService.Infrastructure/"]
-COPY ["Shared/CacheService/CacheService.csproj", "Shared/CacheService/"]
-COPY ["Shared/SmsProvider/SmsProvider.csproj", "Shared/SmsProvider/"]
+COPY ["src/OTPService.Api/OTPService.Api.csproj", "src/OTPService.Api/"]
+COPY ["src/OTPService.Application/OTPService.Application.csproj", "src/OTPService.Application/"]
+COPY ["src/OTPService.Domain/OTPService.Domain.csproj", "src/OTPService.Domain/"]
+COPY ["src/OTPService.Infrastructure/OTPService.Infrastructure.csproj", "src/OTPService.Infrastructure/"]
+COPY ["shared/CacheService/CacheService.csproj", "shared/CacheService/"]
+COPY ["shared/SmsProvider/SmsProvider.csproj", "shared/SmsProvider/"]
 
 # Restore packages
-RUN dotnet restore "./OTPService/OTPService.Api/OTPService.Api.csproj"
+RUN dotnet restore "./src/OTPService.Api/OTPService.Api.csproj"
 
 # Copy remaining source code
 COPY . .
 
 # Build and publish
-WORKDIR /src/OTPService/OTPService.Api
+WORKDIR /src/src/OTPService.Api
 RUN dotnet publish --no-restore -c Release -o /app/publish
 
 FROM base AS final

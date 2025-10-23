@@ -14,8 +14,8 @@ services:
       - REDIS_USERNAME=default
       - REDIS_PASSWORD=your-redis-password-here
     volumes:
-      - ./OTPService/OTPService.Api/appsettings.json:/app/appsettings.json:ro
-      - ./OTPService/OTPService.Api/.env:/app/.env:ro
+      - ./src/OTPService.Api/appsettings.json:/app/appsettings.json:ro
+      - ./src/OTPService.Api/.env:/app/.env:ro
     depends_on:
       - redis
 
