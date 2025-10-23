@@ -57,3 +57,4 @@ bin
 bin/*
 obj
 obj/*
+docker-compose.debug.yml
