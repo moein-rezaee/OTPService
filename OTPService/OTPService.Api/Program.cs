@@ -56,6 +56,20 @@ builder.Services.Configure<DefaultCacheOptions>(opt =>
     opt.DefaultProvider = builder.Configuration.GetValue<string>("Cache:DefaultProvider") ?? cacheDefault.DefaultProvider;
 });
 
+// Helper to expand ${ENV_VAR} placeholders found in appsettings
+static string ExpandEnv(string? value)
+{
+    if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+    value = value.Trim();
+    if (value.StartsWith("${") && value.EndsWith("}"))
+    {
+        var key = value.Substring(2, value.Length - 3);
+        var env = Environment.GetEnvironmentVariable(key);
+        return string.IsNullOrWhiteSpace(env) ? value : env!;
+    }
+    return value;
+}
+
 // Register Redis (if configured) and Memory, select default
 var redisSection = builder.Configuration.GetSection("Cache:Providers:Redis");
 var redisOptions = new RedisOptions();
@@ -72,7 +86,14 @@ if (redisConfigured)
         cfg.Password = redisOptions.Password;
         return ConnectionMultiplexer.Connect(cfg);
     });
-    builder.Services.Configure<RedisOptions>(redisSection);
+    builder.Services.Configure<RedisOptions>(opt =>
+    {
+        opt.Host = ExpandEnv(redisSection["Host"]);
+        opt.Port = int.TryParse(ExpandEnv(redisSection["Port"]), out var p) ? p : redisOptions.Port;
+        opt.Username = ExpandEnv(redisSection["Username"]);
+        opt.Password = ExpandEnv(redisSection["Password"]);
+        opt.InstanceName = ExpandEnv(redisSection["InstanceName"]);
+    });
 }
 
 builder.Services.AddScoped<ICacheServiceFactory, CacheServiceFactory>();
@@ -89,19 +110,28 @@ else
 // Configure SMS providers (register configured, pick default, expose factory)
 var kavenegarSection = builder.Configuration.GetSection("Sms:Providers:Kavenegar");
 var farapayamakSection = builder.Configuration.GetSection("Sms:Providers:Farapayamak");
-var kavenegarConfigured = !string.IsNullOrWhiteSpace(kavenegarSection["ApiKey"]) && !string.IsNullOrWhiteSpace(kavenegarSection["Sender"]);
-var farapayamakConfigured = !string.IsNullOrWhiteSpace(farapayamakSection["Username"]) && !string.IsNullOrWhiteSpace(farapayamakSection["Password"]) && (!string.IsNullOrWhiteSpace(farapayamakSection["From"]) || !string.IsNullOrWhiteSpace(farapayamakSection["Sender"]));
+var kavApiKey = ExpandEnv(kavenegarSection["ApiKey"]);
+var kavSender = ExpandEnv(kavenegarSection["Sender"]);
+var kavenegarConfigured = !string.IsNullOrWhiteSpace(kavApiKey) && !string.IsNullOrWhiteSpace(kavSender);
+var fUser = ExpandEnv(farapayamakSection["Username"]);
+var fPass = ExpandEnv(farapayamakSection["Password"]);
+var fFrom = ExpandEnv(farapayamakSection["From"]) ?? ExpandEnv(farapayamakSection["Sender"]);
+var farapayamakConfigured = !string.IsNullOrWhiteSpace(fUser) && !string.IsNullOrWhiteSpace(fPass) && !string.IsNullOrWhiteSpace(fFrom);
 
 if (kavenegarConfigured)
-    builder.Services.Configure<KavenegarOptions>(kavenegarSection);
+    builder.Services.Configure<KavenegarOptions>(opt =>
+    {
+        opt.ApiKey = kavApiKey;
+        opt.Sender = kavSender;
+    });
 
 if (farapayamakConfigured)
 {
     builder.Services.Configure<FarapayamakOptions>(opt =>
     {
-        opt.Username = farapayamakSection["Username"] ?? string.Empty;
-        opt.Password = farapayamakSection["Password"] ?? string.Empty;
-        opt.From = farapayamakSection["From"] ?? farapayamakSection["Sender"] ?? string.Empty;
+        opt.Username = fUser;
+        opt.Password = fPass;
+        opt.From = fFrom ?? string.Empty;
     });
 }
 
