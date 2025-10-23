@@ -22,20 +22,26 @@ public class SwaggerDefaultValues : IOperationFilter
             operation.Responses.Add("500", new OpenApiResponse { Description = "خطای داخلی سرور" });
         }
 
-        foreach (var parameter in operation.Parameters)
+        if (operation.Parameters is { Count: > 0 })
         {
-            var description = apiDescription.ParameterDescriptions
-                .First(p => p.Name == parameter.Name);
-
-            parameter.Description ??= description.ModelMetadata?.Description;
-
-            if (parameter.Schema.Default == null && description.DefaultValue != null && description.ModelMetadata?.ModelType != null)
+            foreach (var parameter in operation.Parameters)
             {
-                var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata.ModelType);
-                parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
-            }
+                var description = apiDescription.ParameterDescriptions
+                    .FirstOrDefault(p => string.Equals(p.Name, parameter.Name, StringComparison.OrdinalIgnoreCase));
 
-            parameter.Required |= description.IsRequired;
+                if (description is null)
+                    continue;
+
+                parameter.Description ??= description.ModelMetadata?.Description;
+
+                if (parameter.Schema.Default == null && description.DefaultValue != null && description.ModelMetadata?.ModelType != null)
+                {
+                    var json = JsonSerializer.Serialize(description.DefaultValue, description.ModelMetadata.ModelType);
+                    parameter.Schema.Default = OpenApiAnyFactory.CreateFromJson(json);
+                }
+
+                parameter.Required |= description.IsRequired;
+            }
         }
     }
 }

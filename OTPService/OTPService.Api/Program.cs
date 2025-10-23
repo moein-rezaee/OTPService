@@ -76,6 +76,9 @@ if (redisConfigured)
 }
 
 builder.Services.AddScoped<ICacheServiceFactory, CacheServiceFactory>();
+builder.Services.AddScoped<MemoryCacheService>();
+if (redisConfigured)
+    builder.Services.AddScoped<RedisCacheService>();
 
 var cacheDefaultProvider = (builder.Configuration.GetValue<string>("Cache:DefaultProvider") ?? cacheDefault.DefaultProvider).Trim();
 if (string.Equals(cacheDefaultProvider, "Redis", StringComparison.OrdinalIgnoreCase) && redisConfigured)
