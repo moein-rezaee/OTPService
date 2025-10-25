@@ -1,0 +1,57 @@
+include:
+  - ../OTPService/docker-compose.yml
+
+services:
+  authenticationservice:
+    image: authentication-service:0.0.0
+    container_name: authentication-service
+    build:
+      context: ..
+      dockerfile: AuthenticationService/AuthenticationService.Api/Dockerfile
+    ports:
+      - "5270:5270"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5270
+      - OTP_BASE_URL=http://otpservice:5254
+      - AUTH_PG_HOST=auth-postgres
+      - AUTH_PG_PORT=5432
+      - AUTH_PG_DB=authdb
+      - AUTH_PG_USER=postgres
+      - AUTH_PG_PASSWORD=postgres
+      - AUTH_REDIS_HOST=auth-redis
+      - AUTH_REDIS_PORT=6379
+      - AUTH_REDIS_USER=default
+      - AUTH_REDIS_PASSWORD=
+    volumes:
+      - ./AuthenticationService.Api/appsettings.json:/app/appsettings.json:ro
+      - ./AuthenticationService.Api/.env:/app/.env:ro
+    depends_on:
+      - auth-postgres
+      - auth-redis
+      - otpservice
+
+  auth-postgres:
+    image: postgres:16-alpine
+    container_name: auth-postgres
+    environment:
+      - POSTGRES_DB=authdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_pg_data:/var/lib/postgresql/data
+
+  auth-redis:
+    image: redis:alpine
+    container_name: auth-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - auth_redis_data:/data
+
+volumes:
+  auth_pg_data:
+  auth_redis_data:
+

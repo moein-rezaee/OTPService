@@ -1,0 +1,35 @@
+include:
+  - ../NotificationService/docker-compose.yml
+
+services:
+  otpservice:
+    image: otp-service:0.0.0
+    container_name: otp-service
+    build:
+      context: ..
+      dockerfile: OTPService/OTPService.Api/Dockerfile
+    ports:
+      - "5254:5254"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5254
+      - NOTIFICATION_BASE_URL=http://notification-service:5260
+      # Cache Settings
+      - REDIS_USERNAME=default
+      - REDIS_PASSWORD=
+    volumes:
+      - ./OTPService.Api/appsettings.json:/app/appsettings.json:ro
+      - ./OTPService.Api/.env:/app/.env:ro
+    depends_on:
+      - notificationservice
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - otp_redis_data:/data
+
+volumes:
+  otp_redis_data:
